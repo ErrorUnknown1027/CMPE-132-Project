@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, request, flash, jsonify
 from flask_login import login_required, current_user
-from .models import Note
+from .models import Note, Book
 from . import db
 import json
 
 views = Blueprint('views', __name__)
 
-
+# home page
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
@@ -23,6 +23,11 @@ def home():
 
     return render_template("home.html", user=current_user)
 
+# list of books
+@views.route('/books')
+def books():
+    books = Book.query.all()
+    return render_template('books.html', user=current_user)
 
 @views.route('/delete-note', methods=['POST'])
 def delete_note():  

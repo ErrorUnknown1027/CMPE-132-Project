@@ -14,3 +14,9 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100))
     first_name = db.Column(db.String(100))
     notes = db.relationship('Note')
+    
+class Book(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100))
+    authorname = db.Column(db.String(100))
+    booknumber = db.Column(db.String(100), unique=True)

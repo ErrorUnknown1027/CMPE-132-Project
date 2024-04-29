@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, flash, jsonify, url_for
 from flask_login import login_required, current_user
+
 from .models import Book
 from . import db
 import json
@@ -14,7 +15,8 @@ def home():
 #browse pbook age
 @views.route("/browse")
 def browse():
-    return render_template("browse.html")
+    books = Book.query.all()
+    return render_template("browse.html", books=books)
 
 #logout page
 @views.route("/logout")
@@ -27,9 +29,34 @@ def checkout():
     return render_template("checkout.html")
 
 #add / remove book page
-@views.route("/bookBase")
+@views.route("/bookBase", methods=['GET', 'POST'])
 def bookBase():
-    return render_template("bookBase.html")
+    if request.method == 'POST':
+        title = request.form.get('title')
+        author = request.form.get('author')
+
+        book = Book.query.filter_by(title=title).first()
+        if book:
+            flash('Already have copy of book', category='error')
+        else:
+            #add book to database
+            new_book = Book(title=title, authorname=author)
+            db.session.add(new_book)
+            db.session.commit()
+            flash('Book added', category='success')
+        
+    books = Book.query.all()
+    return render_template("bookBase.html", books=books)
+
+#delete book
+@views.route("/delete_book/<int:book_id>", methods=['GET', 'POST'])
+@login_required
+def delete_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    db.session.delete(book)
+    db.session.commit()
+    flash('Book deleted', category='success')
+    return redirect(url_for('views.bookBase'))
 
 #add / remove account page
 @views.route("/userBase")

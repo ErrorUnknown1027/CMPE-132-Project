@@ -1,5 +1,24 @@
-{% extends "base.html" %} {% block title %}Book Database{% endblock %} {% block content
-    %}
-    
-    {% endblock %}
-    
+{% extends "base.html" %}
+
+{% block content %}
+  <form method="POST">
+    <h3 align="center">Add Book</h3>
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" required>
+    <br>
+    <label for="author">Author:</label>
+    <input type="text" id="author" name="author" required>
+    <br>
+    <input type="submit" value="Add Book">
+  </form>
+
+  <h3 align="center">Book List</h3>
+  <div style="overflow-y: scroll; height: 300px;">
+    <ul>
+      {% for book in books %}
+        <li>{{ book.title }} by {{ book.authorname }} <a href="{{ url_for('views.delete_book', book_id=book.id) }}">&times;</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+
+{% endblock %}

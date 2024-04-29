@@ -39,7 +39,7 @@ def signup():
         password2 = request.form.get('password2')
         
         user = User.query.filter_by(email=email).first()
-        if user is None:
+        if user:
             flash('Email already exists', category='error')
         elif len(email) < 4:
             flash('Email must be greater than 3 characters.', category='error')
@@ -49,7 +49,7 @@ def signup():
             flash('Passwords do not match.', category='error')
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
-        else : 
+        elif user is None: 
             #add user to database
             new_user = User(email=email, first_name=firstName, password=generate_password_hash(password1, method='pbkdf2:sha256'))
             db.session.add(new_user)

@@ -1,10 +1,11 @@
-{% extends "base.html" %}
-
-{% block content %}
-  <h1>Browse</h1>
-  <ul>
-    {% for book in books %}
-      <li>{{ book.title }} by {{ book.authorname }}</li>
-    {% endfor %}
-  </ul>
+{% extends "base.html" %} {% block content %}
+<h1>Browse</h1>
+<ul>
+  {% for book in books %}
+  <li>
+    {{ book.title }} by {{ book.authorname }}
+    <a href="{{url_for('views.select_book', book_id=book.id)}}">Select</a>
+  </li>
+  {% endfor %}
+</ul>
 {% endblock %}

@@ -1,5 +1,12 @@
-{% extends "base.html" %} {% block title %}Checked Out Books{% endblock %} {% block content
-    %}
-    
-    {% endblock %}
-    
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Checked-out Books</h1>
+<ul>
+  {% for checked_book in checked_books %}
+  <li>
+    {{ checked_book.book.title }} by {{ checked_book.book.authorname }}
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

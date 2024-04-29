@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, flash, jsonify, url_for
 from flask_login import login_required, current_user
 
-from .models import Book, User
+from .models import Book, CheckedBook, User
 from . import db
 import json
 
@@ -12,21 +12,29 @@ views = Blueprint('views', __name__)
 def home():
     return render_template("home.html")
 
-#browse pbook age
+#browse book age
 @views.route("/browse")
 def browse():
     books = Book.query.all()
     return render_template("browse.html", books=books)
 
+@views.route("/select_book/<int:book_id>")
+@login_required
+def select_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    if CheckedBook.query.filter_by(user_id=current_user.id, book_id=book_id).first():
+        flash('You already have this book selected', category='error')
+    else:
+        checked_book = CheckedBook(user_id=current_user.id, book_id=book_id)
+        db.session.add(checked_book)
+        db.session.commit()
+        flash('Book selected', category='success')
+    return redirect(url_for('views.browse'))
+
 #logout page
 @views.route("/logout")
 def logout():
     return redirect(url_for("views.home"))
-
-#checkout book page
-@views.route("/checkout")
-def checkout():
-    return render_template("checkout.html")
 
 #add / remove book page
 @views.route("/bookBase", methods=['GET', 'POST'])
@@ -78,11 +86,10 @@ def delete_user(user_id):
     flash('User deleted', category='success')
     return redirect(url_for('views.userBase'))
 
-#checked out books page
 @views.route("/checkedBooks")
+@login_required
 def checkedBase():
-    args = request.args
-    name = args.get('name')
-    return render_template("checkedBooks.html", name=name)
+    checked_books = CheckedBook.query.filter_by(user_id=current_user.id).all()
+    return render_template("checkedBooks.html", checked_books=checked_books)
 
 

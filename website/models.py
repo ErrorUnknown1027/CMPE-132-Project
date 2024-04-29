@@ -12,3 +12,12 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     authorname = db.Column(db.String(100))
+    
+class Checkout(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
+    due_date = db.Column(db.DateTime, nullable=False)
+
+    user = db.relationship('User', backref='checkouts')
+    book = db.relationship('Book', backref='checkouts')

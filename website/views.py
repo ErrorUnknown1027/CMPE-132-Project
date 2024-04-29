@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, flash, jsonify, url_for
 from flask_login import login_required, current_user
 
-from .models import Book
+from .models import Book, User
 from . import db
 import json
 
@@ -60,8 +60,23 @@ def delete_book(book_id):
 
 #add / remove account page
 @views.route("/userBase")
+@login_required
 def userBase():
-    return render_template("userBase.html")
+    users = User.query.all()
+    return render_template("userBase.html", users=users)
+
+#delete user
+@views.route("/delete_user/<int:user_id>", methods=['GET', 'POST'])
+@login_required
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash('You cannot delete yourself', category='error')
+        return redirect(url_for('views.userBase'))
+    db.session.delete(user)
+    db.session.commit()
+    flash('User deleted', category='success')
+    return redirect(url_for('views.userBase'))
 
 #checked out books page
 @views.route("/checkedBooks")
@@ -69,3 +84,5 @@ def checkedBase():
     args = request.args
     name = args.get('name')
     return render_template("checkedBooks.html", name=name)
+
+

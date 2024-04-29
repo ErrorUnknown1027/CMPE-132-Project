@@ -92,4 +92,14 @@ def checkedBase():
     checked_books = CheckedBook.query.filter_by(user_id=current_user.id).all()
     return render_template("checkedBooks.html", checked_books=checked_books)
 
-
+@views.route("/remove_checked_book/<int:book_id>", methods=['GET', 'POST'])
+@login_required
+def remove_checked_book(book_id):
+    checked_book = CheckedBook.query.filter_by(user_id=current_user.id, book_id=book_id).first()
+    if checked_book:
+        db.session.delete(checked_book)
+        db.session.commit()
+        flash('Book removed from checked books', category='success')
+    else:
+        flash('Book not found in checked books', category='error')
+    return redirect(url_for('views.checkedBase'))

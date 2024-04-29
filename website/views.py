@@ -1,42 +1,44 @@
-from flask import Blueprint, render_template, request, flash, jsonify
+from flask import Blueprint, redirect, render_template, request, flash, jsonify, url_for
 from flask_login import login_required, current_user
-from .models import Note, Book
+from .models import Book
 from . import db
 import json
 
 views = Blueprint('views', __name__)
 
-# home page
-@views.route('/', methods=['GET', 'POST'])
-@login_required
+#home page
+@views.route("/")
 def home():
-    if request.method == 'POST': 
-        note = request.form.get('note')#Gets the note from the HTML 
+    return render_template("home.html")
 
-        if len(note) < 1:
-            flash('Note is too short!', category='error') 
-        else:
-            new_note = Note(data=note, user_id=current_user.id)  #providing the schema for the note 
-            db.session.add(new_note) #adding the note to the database 
-            db.session.commit()
-            flash('Note added!', category='success')
+#browse pbook age
+@views.route("/browse")
+def browse():
+    return render_template("browse.html")
 
-    return render_template("home.html", user=current_user)
+#logout page
+@views.route("/logout")
+def logout():
+    return redirect(url_for("views.home"))
 
-# list of books
-@views.route('/books')
-def books():
-    books = Book.query.all()
-    return render_template('books.html', user=current_user)
+#checkout book page
+@views.route("/checkout")
+def checkout():
+    return render_template("checkout.html")
 
-@views.route('/delete-note', methods=['POST'])
-def delete_note():  
-    note = json.loads(request.data) # this function expects a JSON from the INDEX.js file 
-    noteId = note['noteId']
-    note = Note.query.get(noteId)
-    if note:
-        if note.user_id == current_user.id:
-            db.session.delete(note)
-            db.session.commit()
+#add / remove book page
+@views.route("/bookBase")
+def bookBase():
+    return render_template("bookBase.html")
 
-    return jsonify({})
+#add / remove account page
+@views.route("/userBase")
+def userBase():
+    return render_template("userBase.html")
+
+#checked out books page
+@views.route("/checkedBooks")
+def checkedBase():
+    args = request.args
+    name = args.get('name')
+    return render_template("checkedBooks.html", name=name)
